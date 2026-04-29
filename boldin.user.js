@@ -9,14 +9,14 @@
 // @run-at       document-start
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
     // ==========================================
     // 1. Existing Logic: Clear MUI Filters & Pointer Events
     // ==========================================
     var css = '[class^="mui"], [class*=" mui"] { filter: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; } ' +
-              '[class^="mui"]::before, [class*=" mui"]::before, [class^="mui"]::after, [class*=" mui"]::after { content: none !important; filter: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }';
+        '[class^="mui"]::before, [class*=" mui"]::before, [class^="mui"]::after, [class*=" mui"]::after { content: none !important; filter: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }';
     var styleOverride = document.createElement('style');
     styleOverride.type = 'text/css';
     if (styleOverride.styleSheet) {
@@ -166,10 +166,10 @@
         unlockSuggestions();
     }
 
-    var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
+    var observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
             if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach(function(node) {
+                mutation.addedNodes.forEach(function (node) {
                     if (node.nodeType === 1) {
                         unblockPointerEvents([node]);
                         var childMui = node.querySelectorAll('[class^="mui"], [class*=" mui"]');
@@ -200,5 +200,37 @@
         attributeFilter: ['class', 'style', 'data-sentry-component']
     });
 
-    console.log('Boldin Enhancements Script Active: Promo Hiding & Coach Unlocking.');
+    // ==========================================
+    // 4. Targeted Chart Fix (UpgradeOverlay)
+    // ==========================================
+    const targetedSelector = `
+        div[data-sentry-component="UpgradeOverlay"] .recharts-responsive-container, 
+        div[data-sentry-component="UpgradeOverlay"] .recharts-wrapper, 
+        div[data-sentry-component="UpgradeOverlay"] .nrchart-parent-wrapper
+    `;
+
+    const applyFix = () => {
+        const chartElements = document.querySelectorAll(targetedSelector);
+
+        chartElements.forEach(el => {
+            // Ensure the chart is interactive
+            el.style.setProperty('pointer-events', 'auto', 'important');
+
+            // Bring chart to the absolute front within its container
+            el.style.setProperty('z-index', '2147483647', 'important');
+
+            // Mask underlying elements with a solid white background
+            el.style.setProperty('background-color', 'white', 'important');
+
+            // Force relative positioning so z-index is respected
+            if (getComputedStyle(el).position === 'static') {
+                el.style.setProperty('position', 'relative', 'important');
+            }
+        });
+    };
+
+    applyFix();
+    setInterval(applyFix, 1000);
+
+    console.log('Boldin Enhancements Script Active: Promo Hiding, Coach Unlocking & Targeted Chart Fix.');
 })();

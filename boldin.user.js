@@ -45,15 +45,8 @@
     }
 
     function unblockPointerEvents(elements) {
-        for (var i = 0; i < elements.length; i++) {
-            var el = elements[i];
-            if (el.nodeType === 1 && typeof el.className === 'string' && /mui/i.test(el.className)) {
-                var computedStyle = window.getComputedStyle(el);
-                if (computedStyle.pointerEvents === 'none') {
-                    el.style.setProperty('pointer-events', 'auto', 'important');
-                }
-            }
-        }
+        // Disabled: Forcing pointer-events to 'auto' on all .mui elements breaks interaction
+        // with standard text fields, inputs, and floating labels in Material-UI.
     }
 
     // ==========================================
